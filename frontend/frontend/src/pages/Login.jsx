@@ -21,6 +21,7 @@ const Login = () => {
       // Store tokens in localStorage or cookies
       localStorage.setItem("access_token", response.data.access_token);
       localStorage.setItem("refresh_token", response.data.refresh_token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       // Redirect to home page
       navigate("/");

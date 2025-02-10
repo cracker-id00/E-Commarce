@@ -5,10 +5,16 @@ import "../Style/Navbar.css";
 const Navbar = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("access_token");
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const handelUser = () => {
+
+  };
   
   const handelLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
     navigate(ROUTES.LOGIN);
   }
   
@@ -17,17 +23,21 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
         <h1 className="text-2xl font-bold">
-          <Link to={ROUTES.HOME} className="hover:text-gray-300">MyWebsite</Link>
+          <Link to={ROUTES.HOME} className="hover:text-gray-300">Nisha's Crochet World</Link>
         </h1>
 
         {/* Navigation Links */}
         <ul className="flex space-x-6">
           { token ? (
             <>
+              <li><button onClick={handelLogout} className="bg-red-500 px-4 py-2 rounded">UserName</button></li>
               <li><button onClick={handelLogout} className="bg-red-500 px-4 py-2 rounded">Logout</button></li>
             </>
           ) : (
-              <li><Link to={ROUTES.LOGIN} className="hover:text-gray-300">Login</Link></li>
+              <>
+                <li><Link to={ROUTES.LOGIN} className="hover:text-gray-300">Login</Link></li>
+                <li><Link to={ROUTES.REGISTER} className="hover:text-gray-300">Sign Up</Link></li>
+              </>
           )}
           
   
