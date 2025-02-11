@@ -4,6 +4,7 @@ export const ROUTES = {
     CONTACT: "/contact",
     LOGIN: "/login",
     REGISTER: "/register",
+    PROFILE: "/profile",
   };
   
   import Home from "../pages/Home.jsx";
@@ -11,6 +12,7 @@ export const ROUTES = {
   import Contact from "../pages/Contact.jsx";
   import Login from "../pages/Login.jsx";
   import Register from "../pages/Register.jsx";
+  import Profile from "../pages/Profile.jsx";
   
   const routes = [
     { path: ROUTES.HOME, element: <Home /> },
@@ -18,6 +20,7 @@ export const ROUTES = {
     { path: ROUTES.CONTACT, element: <Contact /> },
     { path: ROUTES.LOGIN, element: <Login /> },
     { path: ROUTES.REGISTER, element: <Register /> },
+    { path: ROUTES.PROFILE, element: <Profile /> },
   ];
   
   export default routes;

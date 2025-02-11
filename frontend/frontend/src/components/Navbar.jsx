@@ -27,10 +27,10 @@ const Navbar = () => {
         </h1>
 
         {/* Navigation Links */}
-        <ul className="flex space-x-6">
+        <ul className="flex space-x-6 items-baseline">
           { token ? (
             <>
-              <li><button onClick={handelLogout} className="bg-red-500 px-4 py-2 rounded">UserName</button></li>
+              <li><Link to={ROUTES.PROFILE} className="bg-red-500 px-4 py-2 rounded">{user.first_name}</Link></li>
               <li><button onClick={handelLogout} className="bg-red-500 px-4 py-2 rounded">Logout</button></li>
             </>
           ) : (
