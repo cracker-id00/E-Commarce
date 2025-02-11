@@ -31,6 +31,7 @@ const Navbar = () => {
           { token ? (
             <>
               <li><Link to={ROUTES.PROFILE} className="bg-red-500 px-4 py-2 rounded">{user.first_name}</Link></li>
+              <li><Link to={ROUTES.CART} className="bg-red-500 px-4 py-2 rounded">My Cart</Link></li>
               <li><button onClick={handelLogout} className="bg-red-500 px-4 py-2 rounded">Logout</button></li>
             </>
           ) : (

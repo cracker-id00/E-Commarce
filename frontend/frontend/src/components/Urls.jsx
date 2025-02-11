@@ -5,6 +5,7 @@ export const ROUTES = {
     LOGIN: "/login",
     REGISTER: "/register",
     PROFILE: "/profile",
+    CART: "/cart",
   };
   
   import Home from "../pages/Home.jsx";
@@ -13,6 +14,7 @@ export const ROUTES = {
   import Login from "../pages/Login.jsx";
   import Register from "../pages/Register.jsx";
   import Profile from "../pages/Profile.jsx";
+  import Cart from "../pages/Cart.jsx";
   
   const routes = [
     { path: ROUTES.HOME, element: <Home /> },
@@ -21,6 +23,7 @@ export const ROUTES = {
     { path: ROUTES.LOGIN, element: <Login /> },
     { path: ROUTES.REGISTER, element: <Register /> },
     { path: ROUTES.PROFILE, element: <Profile /> },
+    { path: ROUTES.CART, element: <Cart /> },
   ];
   
   export default routes;

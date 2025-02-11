@@ -5,6 +5,29 @@ function Home() {
   const [products, setProducts] = useState([]); // State to store products
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
+  const [cart, setCart] = useState([]);
+  const token = localStorage.getItem("access_token");
+
+  const handleAddToCart = async (productId) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/cart/',
+        { product_id: productId },
+        {
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      setCart(response.data.items);
+      alert('Product added to cart!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('You need to login first!');
+    }
+  };
 
   useEffect(() => {
     axios
@@ -41,7 +64,7 @@ function Home() {
         </div>
         <h2 className="text-lg font-bold">{product.name}</h2>
         <p className="text-gray-700">₹{product.price}</p>
-        <button className="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300">
+        <button className="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300" onClick={() => handleAddToCart(product.id)}>
           Add to Cart
         </button>
       </div>

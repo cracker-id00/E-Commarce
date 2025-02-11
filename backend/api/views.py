@@ -77,3 +77,34 @@ def get_csrf_token(request):
 def profile(request):
     user = request.user
     return Response({'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name, 'address': user.address, 'phone_number': user.phone_number})
+
+
+class CartView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        serializer = CartSerializer(cart)
+        return Response(serializer.data)
+
+    def post(self, request):
+        product_id = request.data.get('product_id')
+        quantity = request.data.get('quantity', 1)
+        
+        try:
+            product = Product.objects.get(id=product_id)
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            
+            cart_item, item_created = CartItem.objects.get_or_create(
+                cart=cart,
+                product=product,
+                defaults={'quantity': quantity}
+            )
+            
+            if not item_created:
+                cart_item.quantity += quantity
+                cart_item.save()
+                
+            return Response(CartSerializer(cart).data)
+            
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=404)

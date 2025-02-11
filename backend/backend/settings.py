@@ -41,10 +41,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-SESSION_EXPIRE_SECONDS = 6
-SESSION_COOKIE_AGE = 6  # 1 week
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_EXPIRE_AFTER_LAST_ACTIVITY = False
+SESSION_EXPIRE_SECONDS = 3600
+SESSION_COOKIE_AGE = 3600  # 1 week
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 CSRF_COOKIE_NAME = "csrftoken"
@@ -59,8 +59,6 @@ SESSION_COOKIE_HTTPONLY = True
 # ✅ REST FRAMEWORK CONFIGURATION
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (

@@ -5,7 +5,8 @@ import Footer from "./components/Footer.jsx";
 import './Style/App.css'
 
 function App() {
-  
+
+
   return (
     <Router>
       <Navbar />

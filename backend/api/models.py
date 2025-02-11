@@ -41,7 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-
 # Category Model
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -52,7 +51,6 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
 
 # Product Model
 class Product(models.Model):
@@ -72,7 +70,6 @@ class Product(models.Model):
     def get_final_price(self):
         return self.discount_price if self.discount_price else self.price
 
-
 # Order Model
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -90,7 +87,6 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} by {self.user.username}"
-
 
 # Cart Model
 class Cart(models.Model):
