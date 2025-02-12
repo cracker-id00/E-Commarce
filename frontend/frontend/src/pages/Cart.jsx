@@ -41,15 +41,34 @@ function Cart() {
     }
   };
 
-  const handleBuy = () => {
-    alert('Proceeding to buy items...');
-    // Implement the buy functionality here
-  };
+    const handleBuy = async () => {
+      alert('Proceeding to buy items...');
+      try {
+        await axios.post('http://localhost:8000/api/orders/create/', {}, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+        
+        // Clear local cart state
+        setCart([]);
+        setError(null);
+        alert('Order placed successfully!');
+        
+      } catch (error) {
+        console.error('Order creation failed:', error);
+        setError(error.response?.data?.error || 'Failed to place order');
+      }
+    };
+
 
   if (loading) return <p>Loading cart...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
-  const totalPrice = cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
+ // Update the totalPrice calculation to use final price
+const totalPrice = cart.reduce((total, item) => 
+  total + (item.product.discount_price || item.product.price) * item.quantity, 0
+);
 
   return (
     <div className="container mx-auto p-4">

@@ -1,16 +1,21 @@
 import { Link,useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { ROUTES } from "./Urls.jsx";
 import "../Style/Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("access_token");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [ user, setUser ] =useState( () => JSON.parse(localStorage.getItem("user")));
 
-  const handelUser = () => {
+  useEffect(() => {
+    const handelUserUpdate = () => {
+      setUser(JSON.parse(localStorage.getItem("user")));
+    };
+    window.addEventListener("userUpdates", handelUserUpdate);
+    return () => window.removeEventListener("userUpdates", handelUserUpdate);
+  }, []);
 
-  };
-  
   const handelLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
