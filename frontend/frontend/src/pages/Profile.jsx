@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useUser } from "../components/UserContext";
 
 const ShowProfile = () => {
   const [activeSection, setActiveSection] = useState("details");
-  const [user, setUser] = useState(null);
+  const {user, setUser} = useUser();
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,8 +75,6 @@ const ShowProfile = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
       });
       setUser(response.data);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      window.dispatchEvent(new Event('userUpdates'));
       setIsEditing(false);
     } catch (error) {
       setError("Failed to update profile");
@@ -122,6 +121,7 @@ const ShowProfile = () => {
 
   return (
     <div className="container mx-auto p-4">
+      
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Profile Dashboard</h1>
       
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
@@ -172,7 +172,7 @@ const ShowProfile = () => {
                       />
                     </>
                   ) : (
-                    <p>{user.first_name} {user.last_name}</p>
+                    <p>{user?.first_name} {user?.last_name}</p>
                   )}
                 </div>
                 <div className="mb-4">
@@ -396,6 +396,7 @@ const ShowProfile = () => {
         )}
       </div>
     </div>
+    
   );
 };
 

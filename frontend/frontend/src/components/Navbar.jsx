@@ -2,25 +2,20 @@ import { Link,useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ROUTES } from "./Urls.jsx";
 import "../Style/Navbar.css";
+import { useUser } from "./UserContext.jsx";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("access_token");
-  const [ user, setUser ] =useState( () => JSON.parse(localStorage.getItem("user")));
-
-  useEffect(() => {
-    const handelUserUpdate = () => {
-      setUser(JSON.parse(localStorage.getItem("user")));
-    };
-    window.addEventListener("userUpdates", handelUserUpdate);
-    return () => window.removeEventListener("userUpdates", handelUserUpdate);
-  }, []);
+  //const token = localStorage.getItem("access_token");
+  const { user,setUser } = useUser();
 
   const handelLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
+    setUser(null);
     navigate(ROUTES.LOGIN);
+    
   }
   
   return (
@@ -33,7 +28,7 @@ const Navbar = () => {
 
         {/* Navigation Links */}
         <ul className="flex space-x-6 items-baseline">
-          { token ? (
+          { user ? (
             <>
               <li><Link to={ROUTES.PROFILE} className="bg-red-500 px-4 py-2 rounded">{user.first_name}</Link></li>
               <li><Link to={ROUTES.CART} className="bg-red-500 px-4 py-2 rounded">My Cart</Link></li>
