@@ -140,6 +140,23 @@ def addresses(request):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['DELETE','PATCH'])
+@permission_classes([IsAuthenticated])
+def update_address(request, address_id):
+    try:
+        address = UserAddress.objects.get(id=address_id, user=request.user)
+    except UserAddress.DoesNotExist:
+        return Response({'error': 'Address not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'PATCH':
+        serializer = AddressSerializer(address, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        address.delete()
+        return Response({'message': 'Address deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

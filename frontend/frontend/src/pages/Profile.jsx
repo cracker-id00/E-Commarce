@@ -26,6 +26,7 @@ const ShowProfile = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('credit_card');
+  const [isClicked,setIsClicked] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,18 +57,54 @@ const ShowProfile = () => {
     fetchData();
   }, []);
 
+  const handleAddressEdit = async (address) => {
+    setIsClicked(true);
+    setAddressForm(address);
+  };
+  
+  const handleAddressDelete = async (addressId) => {
+    if (window.confirm("Are you sure you want to delete this address?")) {
+      try {
+        await axios.delete(`http://localhost:8000/api/addresses/${addressId}/`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+        });
+        setAddresses(addresses.filter(addr => addr.id !== addressId));
+      } catch (error) {
+        setError("Failed to delete address");
+      }
+    }
+  };
+  
+ 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/api/addresses/", addressForm, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
-      });
-      setAddresses([...addresses, response.data]);
+      let response;
+      if (addressForm.id) {
+        // Update existing address
+        response = await axios.patch(
+          `http://localhost:8000/api/addresses/${addressForm.id}/`,
+          addressForm,
+          { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
+        );
+        setAddresses(addresses.map(addr => addr.id === addressForm.id ? response.data : addr));
+      } else {
+        // Create new address
+        response = await axios.post(
+          "http://localhost:8000/api/addresses/",
+          addressForm,
+          { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
+        );
+        setAddresses([...addresses, response.data]);
+      }
       setAddressForm({ address: "", city: "", state: "", pin_code: "", country: "" });
+      setIsClicked(false);
     } catch (error) {
-      setError("Failed to save address");
+      setError(addressForm.id ? "Failed to update address" : "Failed to save address");
     }
   };
+
+ 
 
   const handleSave = async () => {
     try {
@@ -271,9 +308,10 @@ const ShowProfile = () => {
                   required
                 />
               </div>
-              <button type="submit" className="mt-4 bg-green-500 text-white px-4 py-2 rounded">
-                Add Address
-              </button>
+               
+                <button type="submit" className="mt-4 bg-green-500 text-white px-4 py-2 rounded">
+                  {isClicked?"Edit ":"Add "}Address
+                </button>
             </form>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -283,8 +321,8 @@ const ShowProfile = () => {
                   <p>{address.city}, {address.state} - {address.pin_code}</p>
                   <p>{address.country}</p>
                   <div className="mt-2 flex gap-2">
-                    <button className="text-blue-500">Edit</button>
-                    <button className="text-red-500">Delete</button>
+                    <button className="text-blue-500" onClick={() => handleAddressEdit(address)}>Edit</button>
+                    <button className="text-red-500" onClick={() => handleAddressDelete(address.id)}>Delete</button>
                   </div>
                 </div>
               ))}
