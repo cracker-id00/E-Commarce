@@ -8,8 +8,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated ,AllowAny
 from django.views.decorators.csrf import ensure_csrf_cookie
+from random import randint
 from .models import *
 from .serializers import *
+#from auth_backends import EmailOrPhoneBackend
 
 class ProductList(APIView):
     permission_classes = [AllowAny]
@@ -17,6 +19,21 @@ class ProductList(APIView):
         items = Product.objects.all()
         serializer = ProductSerializer(items, many=True)
         return Response(serializer.data)
+
+# def send_otp(request):
+#     user_email = 'sahnisha58@gmail.com'
+#     otp = randint(1000,9999)
+#     print(otp)
+#     # send_mail(
+#     #     'Your Account is Hacked ',
+#     #     f'Your HAcked id is {otp}',
+#     #     'sandipdaw.nbv@gmail.com',
+#     #     [user_email],
+#     #     fail_silently=False
+#     # )
+#     request.session['otp'] = otp
+
+#     return Response('OTP Sent')
 
 @api_view(['POST'])
 def register(request):
@@ -37,23 +54,97 @@ def register(request):
 @ensure_csrf_cookie
 @api_view(['POST'])
 def login_view(request):
-    email = request.data.get('email')
+    
+    email = request.data.get('email',None)
+    phone_number = request.data.get('phone_no',None)
     password = request.data.get('password')
-    user = authenticate(request, email=email, password=password)
+    user = None
+    print(request.data)
+    if email:
+        user = EmailOrPhoneBackend.authenticate(request, email=email, password=password)
+    elif phone_number:
+        user = EmailOrPhoneBackend.authenticate(request, phone_number=phone_number, password=password)
+    
+    print(user)
     if user is not None:
         login(request, user)
-        csrf_token = get_token(request)
-        refresh = RefreshToken.for_user(user) 
-        return Response({
-            'message': 'User logged in successfully',
-            'access_token': str(refresh.access_token),
-            'refresh_token': str(refresh),
-            'user': {'email': user.email, 'first_name': user.first_name},
-            'csrf_token':csrf_token}, 
+        #send_otp(request)
+        otp = str(randint(1000,9999))
+        request.session['otp'] = otp
+        if email:
+            request.session['user_email'] = email
+        if phone_number:
+            request.session['user_phone'] = phone_number
+        print(f'Test OTP - {otp}')
+        #csrf_token = get_token(request)
+        #refresh = RefreshToken.for_user(user) 
+        return Response(
+            {
+                'message' : 'OTP sent successfully',
+                'reqires_otp' : True
+            },
             status=status.HTTP_200_OK
-            )
+        )
+        # return Response({
+        #     'message': 'User logged in successfully',
+        #     'access_token': str(refresh.access_token),
+        #     'refresh_token': str(refresh),
+        #     'user': {'email': user.email, 'first_name': user.first_name},
+        #     'csrf_token':csrf_token}, 
+        #     status=status.HTTP_200_OK
+        #     )
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@ensure_csrf_cookie
+@api_view(['POST'])
+def verify_otp(request):
+    #print("Received data:", request.data) 
+    entered_otp = request.data.get('otp')
+    stored_otp = request.session.get('otp')
+    #print(stored_otp)
+    user_email = request.session.get('user_email')
+    user_phone = request.session.get('user_phone')
+
+    if not stored_otp or (not user_email and not user_phone):
+        return Response(
+            {
+                'error':'OTP session expired'
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if entered_otp == stored_otp:
+        del request.session['otp']
+        if user_email:
+            del request.session['user_email']
+            user = User.objects.get(email = user_email)
+        if user_phone:
+            del request.session['user_phone']
+            user = User.objects.get(phone_number = user_phone)
+
+        
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            {
+                'message':'OTP verified sucessfully',
+                'access_token':str(refresh.access_token),
+                'refresh_token':str(refresh),
+                'user':{
+                    'email':user.email,
+                    'first_name':user.first_name
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        return Response({
+            'error':'Invalid OTP'
+        },
+        status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(['POST'])
 def logout_view(request):
